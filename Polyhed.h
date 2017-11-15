@@ -1,6 +1,7 @@
 #ifndef POLYHED_H
 #define POLYHED_H
 
+#include <iostream>
 #include "vector"
 #include "Vector.h"
 

@@ -54,8 +54,8 @@ Tcor Vector::getY() {
     return this->y;
 }
 
-Tcor Vector::dist(Vector) {
-    return sqrt(this->x * this->x + this->y * this->y);
+Tcor Vector::dist(Vector v) {
+    return sqrt((this->x - v.x) * (this->x - v.x) + (this->y - v.y) * (this->y - v.y));
 }
 
 void Vector::print() {

@@ -5,7 +5,7 @@ Polyhed::Polyhed(Tfun _f) {
     Tcor a = 1,
          b = 2,
          g = 0.5;
-    Tcor r, eps = 0.0001;
+    Tcor r, eps = 0.0000001;
 
     this->f = _f;
 
@@ -33,29 +33,27 @@ Polyhed::Polyhed(Tfun _f) {
             if (f(this->v[2]) <= f(v_r) && f(v_r) < f(this->v[1])) {
                 this->v[0] = v_r;
             } else {
-
-                if (f(this->v[1]) <= f(v_r) && f(v_r) < f(this->v[0]))
+                if (f(this->v[1]) <= f(v_r) && f(v_r) < f(this->v[0])) {
                     std::swap(v_r, this->v[0]);
-                else
-                    if (f(v_r) > f(this->v[0]));
+                } else {
+                    // Сжатие фигуры
+                    v_s = this->compression(v_c, this->v[0], g);
 
-                // Сжатие фигуры
-                v_s = this->compression(v_c, this->v[0], g);
-
-                if (f(v_s) < f(this->v[0]))
-                    this->v[0] = v_s;
-                else
-                    if (f(v_s) >= f(this->v[0]))
-                        this->globalCompression();
+                    if (f(v_s) < f(this->v[0]))
+                        this->v[0] = v_s;
+                    else
+                        if (f(v_s) >= f(this->v[0]))
+                            this->globalCompression();
+                }
             }
 
         }
 
         r = this->max();
-
+        v[2].print();
     } while (r > eps);
 
-    this->v[2].print();
+    std::cout << f(this->v[2]) << std::endl;
 }
 
 void Polyhed::init() {
