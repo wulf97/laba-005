@@ -5,12 +5,13 @@ Polyhed::Polyhed(Tfun _f) {
     Tcor a = 1,
          b = 2,
          g = 0.5;
-    Tcor r, eps = 0.0000001;
+    Tcor r, eps = 0.000001;
 
     this->f = _f;
 
     // Инициализация начальных векторов
     this->init();
+
     do {
         // Сортировка векторов по убыванию f(v[0]) - самое большое значение
         this->sort();
@@ -20,6 +21,18 @@ Polyhed::Polyhed(Tfun _f) {
         // Отражение точки относительно центра с коэффициентом a
         v_r = this->reflect(v_c, a);
 
+        std::cout << "v_h";
+        v[0].print();
+        std::cout << "v_g";
+        v[1].print();
+        std::cout << "v_l";
+        v[2].print();
+        std::cout << "v_c";
+        v_c.print();
+        std::cout << "v_r";
+        v_r.print();
+        std::cout << std::endl;
+
         if (f(v_r) < f(this->v[2])) {
             // Растяжение фигуры
             v_e = this->stretch(v_c, v_r, b);
@@ -28,6 +41,7 @@ Polyhed::Polyhed(Tfun _f) {
                 this->v[0] = v_e;
             else
                 this->v[0] = v_r;
+
 
         } else {
             if (f(this->v[2]) <= f(v_r) && f(v_r) < f(this->v[1])) {
@@ -50,7 +64,6 @@ Polyhed::Polyhed(Tfun _f) {
         }
 
         r = this->max();
-        v[2].print();
     } while (r > eps);
 
     std::cout << f(this->v[2]) << std::endl;
@@ -68,8 +81,8 @@ void Polyhed::init() {
 }
 
 void Polyhed::sort() {
-    for (int i = 3; i > 0; i--) {
-        for (int j = i; j < 3 - 1; j++) {
+    for (int i = 2; i > 0; i--) {
+        for (int j = 0; j < i; j++) {
             if (f(this->v[j]) < f(this->v[j + 1]))
                 std::swap(this->v[j], this->v[j + 1]);
         }
