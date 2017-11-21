@@ -22,10 +22,6 @@ private:
     Tcor max();
 
     Tfun f;
-    Vector x_h;
-    Vector x_g;
-    Vector x_l;
-
     Vector v[3];
 };
 

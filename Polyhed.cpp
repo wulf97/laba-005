@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "Polyhed.h"
 
 Polyhed::Polyhed(Tfun _f) {
@@ -6,67 +7,58 @@ Polyhed::Polyhed(Tfun _f) {
          b = 2,
          g = 0.5;
     Tcor r, eps = 0.000001;
+    int it = 0;
 
-    this->f = _f;
+    f = _f;
 
     // Инициализация начальных векторов
-    this->init();
+    init();
 
     do {
         // Сортировка векторов по убыванию f(v[0]) - самое большое значение
-        this->sort();
+        sort();
 
         // Получение центра масс
-        v_c = this->getC();
+        v_c = getC();
         // Отражение точки относительно центра с коэффициентом a
-        v_r = this->reflect(v_c, a);
+        v_r = reflect(v_c, a);
 
-        std::cout << "v_h";
-        v[0].print();
-        std::cout << "v_g";
-        v[1].print();
-        std::cout << "v_l";
-        v[2].print();
-        std::cout << "v_c";
-        v_c.print();
-        std::cout << "v_r";
-        v_r.print();
-        std::cout << std::endl;
-
-        if (f(v_r) < f(this->v[2])) {
+        if (f(v_r) < f(v[2])) {
             // Растяжение фигуры
-            v_e = this->stretch(v_c, v_r, b);
+            v_e = stretch(v_c, v_r, b);
 
-            if (f(v_e) < f(this->v[2]))
-                this->v[0] = v_e;
+            if (f(v_e) < f(v[2]))
+                v[0] = v_e;
             else
-                this->v[0] = v_r;
-
-
+                v[0] = v_r;
         } else {
-            if (f(this->v[2]) <= f(v_r) && f(v_r) < f(this->v[1])) {
-                this->v[0] = v_r;
+            if (f(v[2]) <= f(v_r) && f(v_r) < f(v[1])) {
+                v[0] = v_r;
             } else {
-                if (f(this->v[1]) <= f(v_r) && f(v_r) < f(this->v[0])) {
-                    std::swap(v_r, this->v[0]);
+                if (f(v[1]) <= f(v_r) && f(v_r) < f(v[0])) {
+                    std::swap(v_r, v[0]);
                 } else {
                     // Сжатие фигуры
-                    v_s = this->compression(v_c, this->v[0], g);
+                    v_s = compression(v_c, v[0], g);
 
-                    if (f(v_s) < f(this->v[0]))
-                        this->v[0] = v_s;
+                    if (f(v_s) < f(v[0]))
+                        v[0] = v_s;
                     else
-                        if (f(v_s) >= f(this->v[0]))
-                            this->globalCompression();
+                        if (f(v_s) >= f(v[0]))
+                            globalCompression();
                 }
             }
 
         }
 
-        r = this->max();
-    } while (r > eps);
+        r = max();
+        it++;
 
-    std::cout << f(this->v[2]) << std::endl;
+        std::cout << std::left << std::setw(2) << std::setfill(' ') << it << " | ";
+        std::cout << std::left << std::setw(10) << std::setfill(' ') << v[2].getX() << " | ";
+        std::cout << std::left << std::setw(10) << std::setfill(' ') << v[2].getY() << " | ";
+        std::cout << std::left << std::setw(10) << std::setfill(' ') << r << std::endl;
+    } while (r > eps);
 }
 
 void Polyhed::init() {
@@ -74,27 +66,27 @@ void Polyhed::init() {
     Vector v2(1, 0);
     Vector v3(0, 1);
 
-    this->v[0] = v1;
-    this->v[1] = v2;
-    this->v[2] = v3;
+    v[0] = v1;
+    v[1] = v2;
+    v[2] = v3;
 
 }
 
 void Polyhed::sort() {
     for (int i = 2; i > 0; i--) {
         for (int j = 0; j < i; j++) {
-            if (f(this->v[j]) < f(this->v[j + 1]))
-                std::swap(this->v[j], this->v[j + 1]);
+            if (f(v[j]) < f(v[j + 1]))
+                std::swap(v[j], v[j + 1]);
         }
     }
 }
 
 Vector Polyhed::getC() {
-    return (this->v[1] + this->v[2]) / 2;
+    return (v[1] + v[2]) / 2;
 }
 
 Vector Polyhed::reflect(Vector v_c, Tcor a) {
-    return v_c - (this->v[0] - v_c) * a;
+    return v_c - (v[0] - v_c) * a;
 }
 
 Vector Polyhed::stretch(Vector v_c, Vector v_r, Tcor b) {
@@ -106,20 +98,20 @@ Vector Polyhed::compression(Vector v_c, Vector v_h, Tcor g) {
 }
 
 void Polyhed::globalCompression() {
-    this->v[0] = this->v[2] + (this->v[0] - this->v[2]) / 2;
-    this->v[1] = this->v[2] + (this->v[1] - this->v[2]) / 2;
+    v[0] = v[2] + (v[0] - v[2]) / 2;
+    v[1] = v[2] + (v[1] - v[2]) / 2;
 }
 
 Tcor Polyhed::max() {
     Tcor max;
 
-    max = this->v[0].dist(this->v[1]);
+    max = v[0].dist(v[1]);
 
-    if (max < this->v[0].dist(this->v[2]))
-        max = this->v[0].dist(this->v[2]);
+    if (max < v[0].dist(v[2]))
+        max = v[0].dist(v[2]);
     else
-        if (max < this->v[1].dist(this->v[2]))
-             max = this->v[1].dist(this->v[2]);
+        if (max < v[1].dist(v[2]))
+             max = v[1].dist(v[2]);
 
     return max;
 }

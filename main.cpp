@@ -7,11 +7,6 @@ Tcor f(Vector);
 int main() {
     Polyhed polyhed(*f);
 
-    Vector v1(4, 4);
-    Vector v2;
-
-    v2 = v1 * 2;
-
     return 0;
 }
 
